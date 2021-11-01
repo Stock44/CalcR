@@ -1,0 +1,14 @@
+use std::str::FromStr;
+use crate::ast::{Statement, Expression};
+
+grammar;
+
+pub Statement: Statement = {
+    Expression => Statement::Expression(<>),
+    <variable_name:r"[A-z]+"> "=" <value:Expression> => Statement::Assignment {variable_name: String::from(variable_name), value}
+}
+
+Expression: Box<Expression> = {
+    <value: r"-?\d+\.?\d*|\.\d+"> <unit: r"[A-z]+"> => Box::new(Expression::Number{value: f64::from_str(value).unwrap(), unit: Some(String::from(unit))}),
+    r"-?\d+\.?\d*|\.\d+" => Box::new(Expression::Number{value: f64::from_str(<>).unwrap(), unit: None})
+}
