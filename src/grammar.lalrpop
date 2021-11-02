@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use crate::ast::{Statement, Expression, Unit};
+use crate::ast::{Statement, Expression, Unit, NumType};
 
 grammar;
 
@@ -18,24 +18,27 @@ Comma<T>: Vec<T> = {
 }
 
 Unit: Unit = {
-     <name: UNIT> <power: ("^" <INTEGER>)?>  => Unit(String::from(name), match power {Some(pow) => i64::from_str(pow).unwrap(), _ => 1})
+     <name: IDENTIFIER> <power: ("^" <INTEGER>)?>  => Unit(String::from(name), match power {Some(pow) => i64::from_str(pow).unwrap(), _ => 1})
 }
 
+// TODO differentiate between integer and decimal expressions.
 Expression: Box<Expression> = {
-    <value: NUMBER> <units: Unit+?> => Box::new(Expression::Number{value: f64::from_str(value).unwrap(), units}),
+    <value: INTEGER> <units: Unit+?> => Box::new(Expression::Constant{value: NumType::Integer(i64::from_str(value).unwrap()), units}),
+    <value: DECIMAL> <units: Unit+?> => Box::new(Expression::Constant{value: NumType::Decimal(f64::from_str(value).unwrap()), units}),
 
-    <name: FUNCTION_CALL> <arguments: Exprs> ")" => Box::new(Expression::Function{name: String::from(name), arguments}),
+    <name: IDENTIFIER> "(" <arguments: Exprs> ")" => Box::new(Expression::Function{name: String::from(name), arguments}),
 }
 
 match {
-    r"-?\d+\.?\d*|\.\d+" => NUMBER,
-    r"[A-z][0-z]*" => IDENTIFIER,
+    r"-?(\d*\.\d+)|(\d*\.)" => DECIMAL,
+    r"[A-Za-z]\w*" => IDENTIFIER,
     "^",
+    "(",
     ")",
     ",",
     "=",
 } else {
-    r"[A-z][0-z]*(?:\()" => FUNCTION_CALL,
-    r"[A-z]+" => UNIT,
-    r"(-?[1-9]\d*)" => INTEGER,
+    r"-?\d+" => INTEGER,
+} else {
+
 }
