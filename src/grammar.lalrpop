@@ -1,14 +1,41 @@
 use std::str::FromStr;
-use crate::ast::{Statement, Expression};
+use crate::ast::{Statement, Expression, Unit};
 
 grammar;
 
 pub Statement: Statement = {
     Expression => Statement::Expression(<>),
-    <variable_name:r"[A-z]+"> "=" <value:Expression> => Statement::Assignment {variable_name: String::from(variable_name), value}
+    <variable_name: IDENTIFIER> "=" <value:Expression> => Statement::Assignment {variable_name: String::from(variable_name), value}
+}
+
+Exprs = Comma<Expression>;
+
+Comma<T>: Vec<T> = {
+    <mut v: (<T> ",")*> <e: T> =>{
+            v.push(e);
+            v
+    }
+}
+
+Unit: Unit = {
+     <name: UNIT> <power: ("^" <INTEGER>)?>  => Unit(String::from(name), match power {Some(pow) => i64::from_str(pow).unwrap(), _ => 1})
 }
 
 Expression: Box<Expression> = {
-    <value: r"-?\d+\.?\d*|\.\d+"> <unit: r"[A-z]+"> => Box::new(Expression::Number{value: f64::from_str(value).unwrap(), unit: Some(String::from(unit))}),
-    r"-?\d+\.?\d*|\.\d+" => Box::new(Expression::Number{value: f64::from_str(<>).unwrap(), unit: None})
+    <value: NUMBER> <units: Unit+?> => Box::new(Expression::Number{value: f64::from_str(value).unwrap(), units}),
+
+    <name: FUNCTION_CALL> <arguments: Exprs> ")" => Box::new(Expression::Function{name: String::from(name), arguments}),
+}
+
+match {
+    r"-?\d+\.?\d*|\.\d+" => NUMBER,
+    r"[A-z][0-z]*" => IDENTIFIER,
+    "^",
+    ")",
+    ",",
+    "=",
+} else {
+    r"[A-z][0-z]*(?:\()" => FUNCTION_CALL,
+    r"[A-z]+" => UNIT,
+    r"(-?[1-9]\d*)" => INTEGER,
 }

@@ -6,17 +6,12 @@ pub enum Statement {
     },
 }
 
-
-
-
 pub enum Expression {
     Number {
         value: f64,
-        unit: Option<String>,
+        units: Option<Vec<Unit>>,
     },
-    Variable {
-        name: String,
-    },
+    Variable(String),
     Function {
         name: String,
         arguments: Vec<Box<Expression>>,
@@ -31,6 +26,8 @@ pub enum Expression {
         value: Box<Expression>,
     },
 }
+
+pub struct Unit(pub String, pub i64);
 
 pub enum OpType {
     Multiplication,
