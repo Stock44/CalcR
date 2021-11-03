@@ -3,8 +3,9 @@ name = "CalcR_Core"
 version = "0.1.0"
 edition = "2021"
 authors = ["Hiram Maximiliano Munoz Ramirez <hirammunozr@outlook.com>"]
-crate-type = ["staticlib"]
 
+[lib]
+crate-type = ["lib", "staticlib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
