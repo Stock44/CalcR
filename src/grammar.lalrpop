@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use crate::ast::{Statement, Expression, Unit, NumType};
+use crate::ast::{Statement, Expression, Unit, NumType, OpType};
 
 grammar;
 
@@ -17,22 +17,55 @@ Comma<T>: Vec<T> = {
     }
 }
 
+
+
 Unit: Unit = {
-     <name: IDENTIFIER> <power: ("^" <INTEGER>)?>  => Unit(String::from(name), match power {Some(pow) => i64::from_str(pow).unwrap(), _ => 1})
+     <name: IDENTIFIER> <power: ("_" <INTEGER>)?>  => Unit(String::from(name), match power {Some(pow) => i64::from_str(pow).unwrap(), _ => 1})
 }
 
-// TODO differentiate between integer and decimal expressions.
-Expression: Box<Expression> = {
+Tier<Op,NextTier>: Box<Expression> = {
+    <lhs: Tier<Op,NextTier>> <op_type: Op> <rhs: NextTier> => Box::new(Expression::Operation{op_type, lhs, rhs}),
+    NextTier
+};
+
+Term: Box<Expression> = {
     <value: INTEGER> <units: Unit+?> => Box::new(Expression::Constant{value: NumType::Integer(i64::from_str(value).unwrap()), units}),
     <value: DECIMAL> <units: Unit+?> => Box::new(Expression::Constant{value: NumType::Decimal(f64::from_str(value).unwrap()), units}),
-
     <name: IDENTIFIER> "(" <arguments: Exprs> ")" => Box::new(Expression::Function{name: String::from(name), arguments}),
+    "(" <Expression> ")"
 }
+
+Expression = Tier<AddSubOp, Factor>;
+Factor = Tier<FactorOp, Power>;
+Power = Tier<PowerOp, Term>;
+
+AddSubOp: OpType = { // (3)
+    "+" => OpType::Add,
+    "-" => OpType::Subtract,
+};
+
+FactorOp: OpType = {
+    "*" => OpType::Multiply,
+    "/" => OpType::Divide,
+    "//" => OpType::Floor,
+    "%" => OpType::Modulo,
+};
+
+PowerOp: OpType = {
+    "^" => OpType::Power,
+};
 
 match {
     r"-?(\d*\.\d+)|(\d*\.)" => DECIMAL,
     r"[A-Za-z]\w*" => IDENTIFIER,
+    "+",
+    "-",
+    "*",
+    "/",
+    "//",
+    "%",
     "^",
+    "_",
     "(",
     ")",
     ",",

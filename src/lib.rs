@@ -1,9 +1,7 @@
 #![feature(box_patterns)]
 
-
 use lalrpop_util::lalrpop_mod;
 lalrpop_mod!(pub grammar);
-
 mod ast;
 
 #[cfg(test)]
@@ -23,7 +21,7 @@ mod tests {
     fn integer_parsing() {
         let parser = grammar::StatementParser::new();
         let result: Statement = parser.parse("32").unwrap();
-        let  exp = match_stm_exp(result);
+        let exp = match_stm_exp(result);
         assert!(matches!(exp, Expression::Constant{value: NumType::Integer(32), units: None}));
     }
 
@@ -31,14 +29,14 @@ mod tests {
     fn decimal_parsing() {
         let parser = grammar::StatementParser::new();
         let result: Statement = parser.parse("32.5").unwrap();
-        let  exp = match_stm_exp(result);
+        let exp = match_stm_exp(result);
         assert!(matches!(exp, Expression::Constant{value: NumType::Decimal(32.5), units: None}));
     }
 
     #[test]
     fn number_w_units_parsing() {
         let parser = grammar::StatementParser::new();
-        let result: Statement = parser.parse("32.5 kg m^1 s^-2").unwrap();
+        let result: Statement = parser.parse("32.5 kg m_1 s_-2").unwrap();
 
         let exp = match_stm_exp(result);
         match exp {
@@ -61,7 +59,7 @@ mod tests {
         let result: Statement = parser.parse("atan2(2, 3)").unwrap();
         let exp = match_stm_exp(result);
         match exp {
-            Expression::Function {name,arguments} => {
+            Expression::Function { name, arguments } => {
                 assert_eq!(name, String::from("atan2"));
 
                 assert!(matches!(arguments[0], box Expression::Constant {

@@ -18,8 +18,8 @@ pub enum Expression {
     },
     Operation {
         op_type: OpType,
-        x: Box<Expression>,
-        y: Box<Expression>,
+        lhs: Box<Expression>,
+        rhs: Box<Expression>,
     },
     Conversion {
         target_unit: String,
@@ -32,10 +32,10 @@ pub enum Expression {
 pub struct Unit(pub String, pub i64);
 
 pub enum OpType {
-    Multiplication,
-    Division,
-    Subtraction,
-    Addition,
+    Multiply,
+    Divide,
+    Subtract,
+    Add,
     Floor,
     Modulo,
     Power,
