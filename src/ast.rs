@@ -6,9 +6,11 @@ pub enum Statement {
     },
 }
 
+#[derive(PartialEq)]
+#[derive(Debug)]
 pub enum Expression {
     Constant {
-        value: NumType,
+        value: Number,
         units: Option<Vec<Unit>>,
     },
     Variable(String),
@@ -31,6 +33,8 @@ pub enum Expression {
 #[derive(Debug)]
 pub struct Unit(pub String, pub i64);
 
+#[derive(PartialEq)]
+#[derive(Debug)]
 pub enum OpType {
     Multiply,
     Divide,
@@ -43,7 +47,7 @@ pub enum OpType {
 
 #[derive(PartialEq)]
 #[derive(Debug)]
-pub enum NumType {
+pub enum Number {
     Decimal(f64),
     Integer(i64),
 }

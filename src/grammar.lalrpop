@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use crate::ast::{Statement, Expression, Unit, NumType, OpType};
+use crate::ast::{Statement, Expression, Unit, Number, OpType};
 
 grammar;
 
@@ -29,8 +29,8 @@ Tier<Op,NextTier>: Box<Expression> = {
 };
 
 Term: Box<Expression> = {
-    <value: INTEGER> <units: Unit+?> => Box::new(Expression::Constant{value: NumType::Integer(i64::from_str(value).unwrap()), units}),
-    <value: DECIMAL> <units: Unit+?> => Box::new(Expression::Constant{value: NumType::Decimal(f64::from_str(value).unwrap()), units}),
+    <value: INTEGER> <units: Unit+?> => Box::new(Expression::Constant{value: Number::Integer(i64::from_str(value).unwrap()), units}),
+    <value: DECIMAL> <units: Unit+?> => Box::new(Expression::Constant{value: Number::Decimal(f64::from_str(value).unwrap()), units}),
     <name: IDENTIFIER> "(" <arguments: Exprs> ")" => Box::new(Expression::Function{name: String::from(name), arguments}),
     "(" <Expression> ")"
 }
