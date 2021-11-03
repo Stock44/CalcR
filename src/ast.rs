@@ -1,3 +1,4 @@
+#[derive(PartialEq, Debug)]
 pub enum Statement {
     Expression(Box<Expression>),
     Assignment {
@@ -6,8 +7,7 @@ pub enum Statement {
     },
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum Expression {
     Constant {
         value: Number,
@@ -29,12 +29,10 @@ pub enum Expression {
     },
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub struct Unit(pub String, pub i64);
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum OpType {
     Multiply,
     Divide,
@@ -45,8 +43,7 @@ pub enum OpType {
     Power,
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum Number {
     Decimal(f64),
     Integer(i64),
