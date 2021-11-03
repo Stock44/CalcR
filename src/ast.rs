@@ -24,7 +24,7 @@ pub enum Expression {
         rhs: Box<Expression>,
     },
     Conversion {
-        target_unit: String,
+        target_unit: Unit,
         value: Box<Expression>,
     },
 }

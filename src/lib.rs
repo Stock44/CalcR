@@ -180,4 +180,22 @@ mod tests {
             },
         }))
     }
+
+    #[test]
+    fn conversion_parsing() {
+        let parser = grammar::StatementParser::new();
+        let result: Statement = parser.parse("2 km_2 to m_2").unwrap();
+        let exp = match_stm_exp(result);
+
+        match exp {
+            Expression::Conversion { target_unit, value } => {
+                assert_eq!(target_unit, Unit(String::from("m"), 2));
+                assert_eq!(*value, Expression::Constant {
+                    value: Number::Integer(2),
+                    units: Some(vec![Unit(String::from("km"), 2)]),
+                })
+            }
+            _ => {}
+        }
+    }
 }

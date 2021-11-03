@@ -17,16 +17,19 @@ Comma<T>: Vec<T> = {
     }
 }
 
-
-
-Unit: Unit = {
-     <name: IDENTIFIER> <power: ("_" <INTEGER>)?>  => Unit(String::from(name), match power {Some(pow) => i64::from_str(pow).unwrap(), _ => 1})
+Expression: Box<Expression> = {
+    <value: Expression> "to" <target_unit: Unit> => Box::new(Expression::Conversion{target_unit, value}),
+    AddSub,
 }
 
 Tier<Op,NextTier>: Box<Expression> = {
     <lhs: Tier<Op,NextTier>> <op_type: Op> <rhs: NextTier> => Box::new(Expression::Operation{op_type, lhs, rhs}),
     NextTier
 };
+
+AddSub = Tier<AddSubOp, Factor>;
+Factor = Tier<FactorOp, Power>;
+Power = Tier<PowerOp, Term>;
 
 Term: Box<Expression> = {
     <value: INTEGER> <units: Unit+?> => Box::new(Expression::Constant{value: Number::Integer(i64::from_str(value).unwrap()), units}),
@@ -35,11 +38,11 @@ Term: Box<Expression> = {
     "(" <Expression> ")"
 }
 
-Expression = Tier<AddSubOp, Factor>;
-Factor = Tier<FactorOp, Power>;
-Power = Tier<PowerOp, Term>;
+Unit: Unit = {
+     <name: IDENTIFIER> <power: ("_" <INTEGER>)?>  => Unit(String::from(name), match power {Some(pow) => i64::from_str(pow).unwrap(), _ => 1})
+}
 
-AddSubOp: OpType = { // (3)
+AddSubOp: OpType = {
     "+" => OpType::Add,
     "-" => OpType::Subtract,
 };
@@ -58,6 +61,7 @@ PowerOp: OpType = {
 match {
     r"-?(\d*\.\d+)|(\d*\.)" => DECIMAL,
     r"[A-Za-z][A-Za-z0-9]*" => IDENTIFIER,
+    "to",
     "+",
     "-",
     "*",
