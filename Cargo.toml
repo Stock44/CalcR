@@ -1,5 +1,5 @@
 [package]
-name = "CalcR_Core"
+name = "calc_r"
 version = "0.1.0"
 edition = "2021"
 authors = ["Hiram Maximiliano Munoz Ramirez <hirammunozr@outlook.com>"]
